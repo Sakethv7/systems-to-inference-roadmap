@@ -4,6 +4,10 @@ A private, local learning control center for a nine-layer path from machine and 
 
 It reads [SakethWiki](https://github.com/Sakethv7/SakethWiki) notes from an Obsidian vault, read-only, and maps them onto the layers as live evidence. Ingesting a note never marks a layer complete; completion stays a human decision. Python standard-library server, SQLite progress store, Docker, loopback-only by default. Design docs live in `docs/`.
 
+![Control center showing the current layer, mapped SakethWiki notes, and the nine-layer course map](docs/images/control-center.png)
+
+*Screenshot uses a small demo vault, not real notes.*
+
 Open **http://127.0.0.1:8768/** while the local app runs.
 
 ## Docker app
