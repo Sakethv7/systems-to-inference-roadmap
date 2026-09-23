@@ -1,0 +1,10 @@
+.git
+__pycache__/
+tests/
+backups/
+dist/
+qa-live/
+*.png
+*.tgz
+data/*.sqlite3
+data/*.sqlite3-*

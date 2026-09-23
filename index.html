@@ -1,0 +1,1180 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A first-principles learning path from machine performance and backend systems to LLM inference and agent harness engineering.">
+  <title>Systems → Inference Engineering Learning Path</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Learning">
+  <meta name="theme-color" content="#133a35">
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f4f1ea;
+      --surface: #fffdf8;
+      --ink: #20231f;
+      --muted: #62685f;
+      --line: #d7d3c8;
+      --accent: #1e6252;
+      --accent-soft: #dcebe5;
+      --warm: #9a5b2f;
+      --warm-soft: #f3e4d7;
+      --shadow: 0 18px 55px rgba(32, 35, 31, .08);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 7% 5%, rgba(30, 98, 82, .09), transparent 25rem),
+        var(--paper);
+      font: 16px/1.62 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    a { color: var(--accent); text-underline-offset: 3px; }
+    a:hover { color: #123f35; }
+    code, pre { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
+    code { font-size: .92em; }
+
+    .shell { width: min(1180px, calc(100% - 32px)); margin: 0 auto; }
+    header { padding: 28px 0 20px; }
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--accent);
+      font-size: .76rem;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+    h1 {
+      max-width: 900px;
+      margin: 0;
+      font: 700 clamp(2.2rem, 4.2vw, 4rem)/1.02 Georgia, "Times New Roman", serif;
+      letter-spacing: -.045em;
+    }
+    .lede { max-width: 760px; margin: 14px 0 0; color: var(--muted); font-size: 1rem; }
+    .header-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 270px;
+      gap: 42px;
+      align-items: end;
+    }
+    .progress-card {
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255,253,248,.82);
+      box-shadow: var(--shadow);
+    }
+    .progress-card strong { display: block; font: 700 2.1rem/1 Georgia, serif; }
+    .progress-card span { color: var(--muted); font-size: .88rem; }
+    .progress-track { height: 7px; margin: 15px 0 10px; overflow: hidden; border-radius: 999px; background: #dedbd2; }
+    .progress-fill { width: 0; height: 100%; background: var(--accent); transition: width .25s ease; }
+    .course-home, .course-outline, .learning-history, .course-reference { margin-bottom: 24px; padding: 24px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); box-shadow: var(--shadow); }
+    .course-home { display: grid; grid-template-columns: minmax(0, 1fr) 250px; gap: 28px; align-items: center; }
+    .course-home h2, .course-outline h2, .learning-history h2, .course-reference h2 { margin: 0 0 7px; font: 700 1.55rem/1.15 Georgia, serif; }
+    .course-home p, .course-outline > p, .learning-history > p, .course-reference p { margin: 0; color: var(--muted); }
+    .continue-step { margin-top: 14px !important; font-weight: 750; color: var(--ink) !important; }
+    .completion-hint { margin-top: 7px !important; font-size: .9rem; }
+    .primary-action { display: inline-block; margin-top: 16px; padding: 10px 14px; border: 1px solid var(--accent); border-radius: 9px; color: white; background: var(--accent); font-weight: 800; text-decoration: none; }
+    .primary-action:hover { color: white; background: #174c40; }
+    .course-home-meta { padding: 16px; border-left: 1px solid var(--line); }
+    .course-home-meta strong { display: block; font: 700 1.6rem/1 Georgia, serif; }
+    .course-home-meta span { color: var(--muted); font-size: .88rem; }
+    .course-outline-list { display: grid; gap: 8px; margin-top: 18px; }
+    .module-row { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto auto; gap: 12px; align-items: center; width: 100%; padding: 13px 14px; border: 1px solid var(--line); border-radius: 11px; text-align: left; background: #fbfaf5; }
+    .module-row:hover, .module-row[aria-current="true"] { border-color: var(--accent); background: var(--accent-soft); }
+    .module-number { font-weight: 900; color: var(--accent); }
+    .module-row strong, .module-row span { display: block; }
+    .module-row span { color: var(--muted); font-size: .84rem; }
+    .module-state { padding: 4px 8px; border-radius: 999px; color: var(--warm) !important; background: var(--warm-soft); font-size: .73rem !important; font-weight: 800; text-transform: uppercase; }
+    .module-row[data-state="complete"] .module-state { color: var(--accent) !important; background: var(--accent-soft); }
+    .module-arrow { color: var(--muted); font-size: 1.1rem !important; }
+    .learning-history-list { display: grid; gap: 10px; margin-top: 16px; }
+    .history-group { padding: 13px 14px; border: 1px solid var(--line); border-radius: 11px; background: #fbfaf5; }
+    .history-group h3 { margin: 0 0 8px; font-size: 1rem; }
+    .history-item { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 7px; color: var(--muted); font-size: .9rem; }
+    .history-item + .history-item { margin-top: 6px; }
+    .history-item::before { content: '✓'; color: var(--accent); font-weight: 900; }
+    .history-item small { display: block; margin-top: 2px; color: var(--muted); }
+    .history-empty { margin: 16px 0 0; color: var(--muted); }
+    .course-reference button { margin-top: 14px; }
+    body.control-center { background: #eef2ee; }
+    body.control-center header { background: linear-gradient(120deg, #133a35 0%, #21584f 58%, #315e52 100%); color: #f8f7f1; }
+    body.control-center .eyebrow { color: #a9d8bf; }
+    body.control-center .lede, body.control-center .progress-card span { color: #d4e1d9; }
+    body.control-center .progress-card { border-color: rgba(255,255,255,.19); background: rgba(7,31,27,.32); box-shadow: none; }
+    body.control-center main > .course-home, body.control-center main > .course-outline, body.control-center main > .learning-history, body.control-center main > .course-reference, body.control-center main > .secondary-course-material, body.control-center main > [data-layer] { display: none !important; }
+    .learning-workspace { display: grid; grid-template-columns: minmax(0, 1fr) 290px; gap: 22px; align-items: start; }
+    .workspace-main, .workspace-side { min-width: 0; }
+    .current-task, .task-card, .layer-quiz, .proof-card, .course-map { border: 1px solid #cfd9d3; border-radius: 18px; background: #fbfcf8; box-shadow: 0 14px 34px rgba(31,59,50,.08); }
+    .current-task { padding: 28px; margin-bottom: 18px; background: linear-gradient(145deg, #fbfcf8, #edf5ef); }
+    .current-task h2 { max-width: 740px; margin: 4px 0 8px; font: 700 clamp(1.8rem, 3vw, 2.8rem)/1.05 Georgia, serif; letter-spacing: -.035em; }
+    .current-task p { margin: 0; color: #52625b; font-size: 1rem; }
+    .task-stack { display: grid; gap: 14px; }
+    .task-card, .proof-card, .layer-quiz { padding: 22px; }
+    .task-card[data-done="true"], .proof-card[data-done="true"] { border-color: #77ae90; background: #f0f8f1; }
+    .task-kicker { display: flex; gap: 9px; align-items: center; margin-bottom: 9px; color: #356d5c; font-size: .78rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+    .task-index { display: inline-grid; width: 24px; height: 24px; place-items: center; border-radius: 50%; color: white; background: #1f6555; letter-spacing: 0; }
+    .task-card h3, .proof-card h3, .layer-quiz h3 { margin: 0 0 7px; font: 700 1.28rem/1.15 Georgia, serif; }
+    .task-card p, .proof-card p, .layer-quiz p { margin: 0; color: #52625b; }
+    .task-link { display: inline-block; margin-top: 13px; font-weight: 800; }
+    .task-chapters { margin-top: 13px !important; padding: 11px 12px; border-left: 3px solid #67a883; background: #f1f7f2; font-size: .93rem; }
+    .task-chapters a { font-weight: 800; }
+    .task-evidence { margin-top: 16px; padding-top: 14px; border-top: 1px solid #d9e2dc; }
+    .task-evidence label { padding: 12px 13px; border: 1px solid #cfd9d3; border-radius: 10px; background: white; font-size: .95rem; }
+    .evidence-note { margin-top: 14px; padding: 14px; border: 1px solid #cfd9d3; border-radius: 12px; background: #fbfcf8; }
+    .evidence-note label { display: block; margin-bottom: 8px; color: #315e52; font-size: .82rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+    .evidence-note textarea { width: 100%; min-height: 118px; box-sizing: border-box; resize: vertical; padding: 11px 12px; border: 1px solid #cbd8d0; border-radius: 9px; color: #24302b; background: white; font: .9rem/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .evidence-note small { display: block; margin-top: 7px; color: #64736b; }
+    .task-check { margin-top: 16px; padding: 15px; border-radius: 12px; background: #f2f5f2; }
+    .task-check legend { padding: 0 4px; color: #315e52; font-size: .86rem; font-weight: 850; }
+    .question-option { display: flex; gap: 8px; margin-top: 9px; color: #303b36; font-size: .92rem; }
+    .question-option input { margin-top: 3px; }
+    .task-prompt { margin: 14px 0; padding: 14px; border: 1px solid #cfd9d3; border-radius: 12px; background: #fbfcf8; }
+    .task-prompt strong { display: block; color: #315e52; }
+    .task-prompt small { display: block; margin-top: 7px; color: #64736b; }
+    .quiz-button { margin-top: 12px; padding: 8px 12px; border: 0; border-radius: 8px; color: white; background: #1f6555; font-weight: 800; cursor: pointer; }
+    .quiz-feedback { margin-top: 10px !important; font-size: .9rem; font-weight: 750; }
+    .quiz-feedback[data-correct="true"] { color: #236544; }
+    .quiz-feedback[data-correct="false"] { color: #9a542d; }
+    .save-state { margin-top: 9px !important; color: #487064 !important; font-size: .82rem; font-weight: 750; }
+    .coverage-panel { margin: 0 0 18px; padding: 18px; border: 1px solid #b9d3c5; border-radius: 14px; background: #f5faf5; }
+    .coverage-panel h3 { margin: 0 0 6px; font: 700 1.12rem/1.2 Georgia, serif; }
+    .coverage-panel p { margin: 0; color: #52625b; font-size: .9rem; }
+    .coverage-notes { margin: 12px 0 0; padding: 0; list-style: none; }
+    .coverage-notes li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-top: 1px solid #d9e2dc; font-size: .88rem; }
+    .coverage-notes small { color: #64736b; white-space: nowrap; }
+    .decision-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    .decision-row button { padding: 7px 10px; border-radius: 8px; font-size: .82rem; font-weight: 750; }
+    .decision-row button[aria-pressed="true"] { color: white; border-color: #1f6555; background: #1f6555; }
+    .coverage-warning { margin-top: 10px !important; color: #9a542d !important; font-weight: 750; }
+    .layer-quiz { margin-top: 14px; border-color: #b9d3c5; background: #eef7f0; }
+    .layer-quiz details { margin-top: 12px; }
+    .layer-quiz summary { cursor: pointer; font-weight: 800; }
+    .layer-question { margin: 14px 0; padding: 13px; border: 1px solid #cbded1; border-radius: 10px; background: white; }
+    .layer-question p { color: #28352f; font-weight: 700; }
+    .materials { margin-top: 18px; padding: 17px 20px; border: 1px solid #cfd9d3; border-radius: 14px; background: rgba(255,255,255,.65); }
+    .materials summary { cursor: pointer; font-weight: 800; }
+    .materials ul { margin-bottom: 0; }
+    .workspace-side { position: sticky; top: 78px; }
+    .course-map { padding: 18px; }
+    .course-map h2 { margin: 0 0 7px; font: 700 1.35rem/1.1 Georgia, serif; }
+    .course-map p { margin: 0 0 13px; color: #5b6861; font-size: .88rem; }
+    .map-row { display: grid; grid-template-columns: 27px minmax(0,1fr) auto; gap: 8px; align-items: center; width: 100%; padding: 10px 0; border: 0; border-top: 1px solid #e1e7e3; color: #28352f; background: transparent; text-align: left; cursor: pointer; }
+    .map-row:first-of-type { border-top: 0; }
+    .map-row[aria-current="true"] { color: #17614f; font-weight: 800; }
+    .map-row span { font-size: .78rem; color: #64736b; }
+    .map-dot { width: 10px; height: 10px; border-radius: 50%; background: #d9c9ae; }
+    .map-row[data-state="started"] .map-dot { background: #d69056; }.map-row[data-state="complete"] .map-dot { background: #3b9563; }
+    .workspace-history { margin-top: 16px; font-size: .88rem; }
+    .workspace-history a { font-weight: 800; }
+    body.course-focus:not(.show-secondary) .secondary-course-material { display: none; }
+    body.course-focus .layer { display: none; }
+    body.course-focus .layer.active-course-layer { display: block; }
+    body.course-focus .layer .columns { grid-template-columns: 1fr; }
+    body.course-focus .layer .column + .column { border-top: 1px solid var(--line); border-left: 0; }
+    body.course-focus .layer .checkpoint { background: var(--accent-soft); }
+    body.course-focus .checklist { grid-template-columns: 1fr; }
+    body.course-focus .checklist label { padding: 10px 12px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); }
+    .progress-board { margin-bottom: 34px; padding: 28px; border: 1px solid var(--line); border-radius: 20px; background: var(--surface); box-shadow: var(--shadow); scroll-margin-top: 78px; }
+    .progress-board h2 { margin: 0 0 8px; font: 700 1.8rem/1.15 Georgia, serif; }
+    .progress-board > p { margin: 0; color: var(--muted); }
+    .progress-board-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 22px; }
+    .progress-layer-card { padding: 16px; border: 1px solid var(--line); border-radius: 14px; background: #fbfaf5; }
+    .progress-layer-card h3 { margin: 0; font: 700 1.02rem/1.2 Georgia, serif; }
+    .progress-layer-count { margin: 5px 0 12px; color: var(--muted); font-size: .84rem; }
+    .progress-item { display: flex; width: 100%; gap: 9px; align-items: flex-start; padding: 8px 0; border: 0; border-top: 1px solid var(--line); border-radius: 0; text-align: left; background: transparent; font-size: .86rem; }
+    .progress-item:first-of-type { border-top: 0; }
+    .progress-item::before { content: '○'; flex: 0 0 auto; color: var(--warm); font-size: 1.05rem; line-height: 1; }
+    .progress-item[aria-pressed="true"]::before { content: '✓'; color: var(--accent); font-weight: 900; }
+    .progress-item:hover { color: var(--accent); background: transparent; }
+    .open-layer { display: inline-block; margin-top: 12px; font-size: .82rem; font-weight: 800; }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-block: 1px solid var(--line);
+      background: rgba(244, 241, 234, .92);
+      backdrop-filter: blur(14px);
+    }
+    .nav-inner { display: flex; gap: 8px; padding: 10px 0; overflow-x: auto; scrollbar-width: thin; }
+    .nav-inner a {
+      flex: 0 0 auto;
+      padding: 7px 11px;
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .nav-inner a:hover { color: var(--accent); background: var(--accent-soft); }
+
+    main { padding: 44px 0 80px; }
+    .principle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      margin-bottom: 48px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+    .principle > div { padding: 28px; }
+    .principle > div + div { border-left: 1px solid var(--line); background: var(--accent-soft); }
+    .principle h2 { margin: 0 0 8px; font: 700 1.4rem/1.2 Georgia, serif; }
+    .principle p { margin: 0; color: var(--muted); }
+
+    .layer {
+      scroll-margin-top: 78px;
+      margin: 0 0 34px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--surface);
+      box-shadow: 0 10px 34px rgba(32, 35, 31, .055);
+    }
+    .layer-head {
+      display: grid;
+      grid-template-columns: 72px 1fr auto;
+      gap: 18px;
+      align-items: center;
+      padding: 24px 28px;
+      border-bottom: 1px solid var(--line);
+    }
+    .number {
+      display: grid;
+      width: 56px;
+      height: 56px;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--ink);
+      color: white;
+      font: 700 1.5rem/1 Georgia, serif;
+    }
+    .layer-head h2 { margin: 0; font: 700 1.65rem/1.18 Georgia, serif; }
+    .layer-head p { margin: 5px 0 0; color: var(--muted); }
+    .status { padding: 6px 10px; border-radius: 999px; color: var(--warm); background: var(--warm-soft); font-size: .72rem; font-weight: 800; text-transform: uppercase; }
+    .layer.done .status { color: var(--accent); background: var(--accent-soft); }
+    .focus-panel { margin-bottom: 34px; padding: 28px; border: 1px solid var(--line); border-radius: 20px; background: var(--surface); box-shadow: var(--shadow); }
+    .focus-panel h2 { margin: 0 0 8px; font: 700 1.8rem/1.15 Georgia, serif; }
+    .focus-panel > p { margin: 0; color: var(--muted); }
+    .track-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 22px; }
+    .track-card { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: #fbfaf5; }
+    .track-card h3 { margin: 0 0 7px; font: 700 1.05rem/1.2 Georgia, serif; }
+    .track-card p { margin: 0; color: var(--muted); font-size: .9rem; }
+    .track-card ul { margin: 10px 0 0; color: var(--muted); font-size: .88rem; }
+    .practice-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 22px; }
+    .practice-card { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: #fbfaf5; }
+    .practice-card h3 { margin: 0 0 7px; font: 700 1.05rem/1.2 Georgia, serif; }
+    .practice-card p { margin: 0; color: var(--muted); font-size: .9rem; }
+    .practice-links { display: flex; gap: 8px 14px; flex-wrap: wrap; margin-top: 12px; font-size: .9rem; font-weight: 700; }
+    .gate-list { display: grid; gap: 10px; margin-top: 20px; }
+    .gate { border: 1px solid var(--line); border-radius: 12px; background: #fbfaf5; overflow: hidden; }
+    .gate summary { padding: 14px 16px; cursor: pointer; font-weight: 800; }
+    .gate > div { padding: 0 16px 16px; color: var(--muted); font-size: .92rem; }
+    .gate > div p { margin: 0; }
+    .gate > div p + p { margin-top: 9px; }
+    .focus-hidden { display: none; }
+
+    .columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .column { min-width: 0; padding: 28px; }
+    .column + .column { border-left: 1px solid var(--line); background: #fbfaf5; }
+    .column-label { margin: 0 0 18px; color: var(--accent); font-size: .72rem; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
+    .resource, .lab-step { padding: 16px 0; border-top: 1px solid var(--line); }
+    .resource:first-of-type, .lab-step:first-of-type { padding-top: 0; border-top: 0; }
+    .resource h3, .lab-step h3 { margin: 0 0 5px; font-size: 1rem; }
+    .resource p, .lab-step p { margin: 0; color: var(--muted); font-size: .93rem; }
+    .meta { margin-top: 7px !important; color: var(--warm) !important; font-size: .78rem !important; font-weight: 750; }
+    ul, ol { padding-left: 1.25rem; }
+    li + li { margin-top: .32rem; }
+    pre {
+      margin: 14px 0 0;
+      padding: 15px;
+      overflow-x: auto;
+      border: 1px solid #343a34;
+      border-radius: 11px;
+      color: #e9eee9;
+      background: #242924;
+      font-size: .78rem;
+      line-height: 1.5;
+    }
+    .checkpoint { padding: 22px 28px; border-bottom: 1px solid var(--line); background: var(--accent-soft); }
+    .checkpoint strong { display: block; margin-bottom: 8px; font-family: Georgia, serif; }
+    .checkpoint-instruction { margin: 0 0 12px; color: var(--muted); font-size: .9rem; }
+    .checklist { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 20px; }
+    label { display: flex; gap: 9px; align-items: flex-start; font-size: .9rem; cursor: pointer; }
+    input[type="checkbox"] { width: 17px; height: 17px; margin-top: 3px; accent-color: var(--accent); }
+
+    .tab-ledger { margin-top: 52px; scroll-margin-top: 78px; }
+    .tab-ledger h2 { font: 700 2rem/1.1 Georgia, serif; }
+    table { width: 100%; border-collapse: collapse; overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+    th, td { padding: 14px 16px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: var(--muted); background: #ebe8df; font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; }
+    tr:last-child td { border-bottom: 0; }
+    .keep { color: var(--accent); font-weight: 750; }
+    .close { color: #8a3c2f; font-weight: 750; }
+
+    .live-panel { scroll-margin-top: 78px; margin-bottom: 34px; padding: 24px 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); }
+    .live-panel h2 { margin: 0 0 10px; font: 700 1.65rem/1.2 Georgia, serif; }
+    .live-toolbar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    button, select { font: inherit; color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; background: var(--surface); cursor: pointer; }
+    button:disabled { opacity: .55; cursor: wait; }
+    #live-status { font-weight: 700; color: var(--accent); }
+    #live-status[data-state="unavailable"], #live-status[data-state="partial"] { color: var(--warm); }
+    .note-meta { display: block; color: var(--muted); font-size: .88rem; margin-top: 3px; }
+    #live-list { padding-left: 20px; }
+    #live-list li { padding: 8px 0; overflow-wrap: anywhere; }
+    .progress-tools { margin-top: 18px; }
+    .progress-tools p { font-size: .9rem; }
+    dialog { max-width: min(520px, calc(100% - 32px)); border: 1px solid var(--line); border-radius: 14px; padding: 24px; color: var(--ink); background: var(--surface); }
+    dialog::backdrop { background: rgba(0,0,0,.4); }
+    footer { padding: 28px 0 50px; color: var(--muted); font-size: .82rem; }
+
+    @media (max-width: 820px) {
+      .header-grid, .principle, .columns, .track-grid, .practice-grid, .progress-board-grid, .course-home { grid-template-columns: 1fr; }
+      .principle > div + div, .column + .column { border-top: 1px solid var(--line); border-left: 0; }
+      .progress-card { max-width: 300px; }
+      .course-home-meta { border-top: 1px solid var(--line); border-left: 0; }
+      .module-row { grid-template-columns: 28px minmax(0, 1fr) auto; }
+      .module-arrow { display: none !important; }
+      .layer-head { grid-template-columns: 54px 1fr; padding: 20px; }
+      .status { grid-column: 2; justify-self: start; }
+      .column, .checkpoint { padding: 22px 20px; }
+      .checklist { grid-template-columns: 1fr; }
+      table { display: block; overflow-x: auto; }
+      .learning-workspace { grid-template-columns: 1fr; }
+      .workspace-side { position: static; }
+    }
+
+    @media (max-width: 440px) {
+      .nav-inner { justify-content: space-between; gap: 0; overflow-x: hidden; }
+      .nav-inner a { padding: 7px 4px; font-size: .72rem; }
+    }
+
+    .sync-notice { margin: 8px 0 0; color: #f3d9a4; font-size: .82rem; font-weight: 700; }
+
+    @media (pointer: coarse) {
+      button, .nav-inner a, .question-option, .task-evidence label, summary { min-height: 44px; }
+      .nav-inner a, summary { display: flex; align-items: center; }
+      .question-option { align-items: center; }
+      .question-option input { margin-top: 0; }
+    }
+
+    @media print {
+      body { background: white; font-size: 11pt; }
+      nav, .progress-card { display: none; }
+      header { padding: 24px 0; }
+      .layer { break-inside: avoid; box-shadow: none; }
+      a { color: black; }
+      a::after { content: " (" attr(href) ")"; font-size: 8pt; font-weight: normal; }
+    }
+  </style>
+</head>
+<body class="course-focus control-center">
+  <header>
+    <div class="shell header-grid">
+      <div>
+        <p class="eyebrow">Your systems course</p>
+        <h1>Learn one layer at a time.</h1>
+        <p class="lede">A build-first path from operating systems to inference and reliable agents.</p>
+      </div>
+      <aside class="progress-card" aria-label="Learning progress">
+        <strong id="progress-value">0%</strong>
+        <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progress-fill"></div></div>
+        <span id="progress-detail">0 of 36 checkpoints complete</span>
+        <p class="sync-notice" id="sync-notice" role="status" hidden></p>
+      </aside>
+    </div>
+  </header>
+
+  <nav aria-label="Course navigation">
+    <div class="shell nav-inner">
+      <a href="#course-home">Continue</a><a href="#course-outline">Course outline</a><a href="#learning-history">Done earlier</a><a href="#course-reference">Reference</a>
+    </div>
+  </nav>
+
+  <main class="shell">
+    <section class="learning-workspace" id="learning-workspace" aria-label="Learning workspace"></section>
+
+    <section class="course-home" id="course-home" aria-labelledby="course-home-title">
+      <div>
+        <p class="eyebrow">Continue learning</p>
+        <h2 id="course-home-title">Choose one small next step.</h2>
+        <p id="course-home-description">Loading your current lesson…</p>
+        <p class="continue-step" id="course-home-step"></p>
+        <p class="completion-hint">Open the lesson, then check off each item only after you have done it. Your progress updates automatically.</p>
+        <a class="primary-action" id="open-current-lesson" href="#layer-1">Open lesson</a>
+      </div>
+      <div class="course-home-meta"><strong id="course-home-count">0 / 4</strong><span id="course-home-status">Layer progress</span></div>
+    </section>
+
+    <section class="course-outline" id="course-outline" aria-labelledby="course-outline-title">
+      <p class="eyebrow">Course outline</p>
+      <h2 id="course-outline-title">Nine layers. One open lesson.</h2>
+      <p>Open a layer to select work you have actually done, review the material, and use the exit question before calling it complete.</p>
+      <div class="course-outline-list" id="course-outline-list" aria-label="Course layers"></div>
+    </section>
+
+    <section class="learning-history" id="learning-history" aria-labelledby="learning-history-title">
+      <p class="eyebrow">Done earlier</p>
+      <h2 id="learning-history-title">Your completed work.</h2>
+      <p>Use this as a revisit list. Older checkmarks are preserved without inventing a completion date.</p>
+      <div class="learning-history-list" id="learning-history-list" aria-live="polite"></div>
+      <p class="history-empty" id="learning-history-empty" hidden>No checkpoints selected yet. Open the current lesson and record one completed step.</p>
+    </section>
+
+    <section class="course-reference" id="course-reference" aria-labelledby="course-reference-title">
+      <p class="eyebrow">When you need more</p>
+      <h2 id="course-reference-title">Notes, practice, and optional tracks.</h2>
+      <p>These materials are here when useful. They are not part of today’s next step.</p>
+      <button id="toggle-reference" type="button" aria-expanded="false">Show reference material</button>
+    </section>
+
+    <section class="live-panel secondary-course-material" id="live-notes" aria-labelledby="live-title">
+      <p class="eyebrow">Sakethwiki → your learning roadmap</p>
+      <h2 id="live-title">Latest learning evidence</h2>
+      <div class="live-toolbar">
+        <span id="live-status" role="status">Connecting…</span>
+        <button id="live-refresh" type="button">Refresh now</button>
+        <label for="live-filter">Show</label>
+        <select id="live-filter"><option value="mapped">Roadmap topics</option><option value="all">All notes, including unmapped</option></select>
+      </div>
+      <p id="live-detail">The live site reads your notes while this page is open.</p>
+      <p id="live-warnings" role="status"></p>
+      <p>New notes appear here as saved evidence. Your reviewed position above changes after review; experiments and completion remain your decisions.</p>
+      <p id="live-count" class="note-meta"></p>
+      <ul id="live-list"><li>Waiting for the first snapshot.</li></ul>
+      <noscript>Enable JavaScript to refresh notes. The reviewed roadmap below remains available.</noscript>
+    </section>
+
+
+    <section class="principle secondary-course-material" aria-labelledby="rule-title">
+      <div>
+        <h2 id="rule-title">The working rule</h2>
+        <p>Do not advance because you finished reading. Advance when the experiment produces evidence that you understand the mechanism.</p>
+      </div>
+      <div>
+        <h2>Keep one learning log</h2>
+        <p><code>Concept → my explanation → experiment → result → assumption that broke</code></p>
+      </div>
+    </section>
+
+    <section class="focus-panel secondary-course-material" id="learning-map" aria-labelledby="learning-map-title">
+      <p class="eyebrow">Reference map</p>
+      <h2 id="learning-map-title">One spine, four ways it connects.</h2>
+      <p>Keep this map for context. The course above stays on one lesson at a time, and nothing here changes your progress.</p>
+      <div class="track-grid">
+        <article class="track-card"><h3>Systems spine</h3><p>Machine → network → cache → database → distributed failure → ML execution bridge → transformer serving → harnesses.</p><ul><li>Measure before changing architecture.</li><li>Make state, queues and retries explicit.</li></ul></article>
+        <article class="track-card"><h3>Interview &amp; coding overlay</h3><p>Every two weeks, use the current layer in a design drill; keep implementation fluency separate.</p><ul><li>Requirements, capacity estimate, data model, bottleneck and tradeoff.</li><li>Three LeetCode sessions a week: derive complexity, implement, test edge cases, then explain the invariant.</li></ul></article>
+        <article class="track-card"><h3>FactoryMind transfer</h3><p>Apply each layer to sensor-to-decision systems.</p><ul><li>Sampling, buffering, MQTT and offline recovery.</li><li>Time-series replay, operator approval and safe degradation.</li></ul></article>
+      </div>
+    </section>
+
+
+    <section class="focus-panel secondary-course-material" id="practice-gates" aria-labelledby="practice-gates-title">
+      <p class="eyebrow">Before you move on</p>
+      <h2 id="practice-gates-title">Every layer earns a small piece of evidence.</h2>
+      <p>Use one focused coding or design challenge to prove the current mechanism. Save a short explanation, the code or diagram, the result, and the failure case you tested. The existing exit test is still the completion decision.</p>
+      <div class="practice-grid">
+        <article class="practice-card"><h3>System-design route</h3><p>Use Hello Interview for a compact preparation sequence, then practise one breakdown every two weeks with the mechanism from your current layer.</p><p class="practice-links"><a href="https://www.hellointerview.com/learn/system-design/in-a-hurry/how-to-prepare">How to prepare</a><a href="https://www.hellointerview.com/learn/system-design/in-a-hurry/problem-breakdowns">Problem breakdowns</a><a href="https://www.hellointerview.com/learn/system-design/core-concepts/networking-essentials">Networking essentials</a></p></article>
+        <article class="practice-card"><h3>Coding route</h3><p>Use LeetCode 75 as the repeatable base. For each problem: state the invariant, name time and space cost, implement, then test one edge case before reading another solution.</p><p class="practice-links"><a href="https://leetcode.com/studyplan/leetcode-75/">LeetCode 75</a><a href="https://leetcode.com/problems/lru-cache/">LRU Cache</a><a href="https://leetcode.com/problems/time-based-key-value-store/">Time Based Key-Value Store</a></p></article>
+        <article class="practice-card"><h3>Evidence format</h3><p>Keep it small: 30–60 minutes. A passing result alone is weak evidence; the explanation must say which assumption broke when you changed load, ordering, capacity, failure, or concurrency.</p><p class="practice-links"><a href="#layer-1">Current Layer 1 gate</a><a href="#ml-bridge">ML bridge gate</a><a href="#reading-desk">Reading log prompt</a></p></article>
+      </div>
+      <div class="gate-list" aria-label="Layer evidence gates">
+        <details class="gate"><summary>1 · Machine and OS — worker-pool gate</summary><div><p>Implement a bounded worker pool or a shared-counter experiment. Make one run fail through a race, missing join, or unbounded queue; fix it and record the before/after behavior.</p><p><strong>Keep:</strong> the scheduling or synchronization invariant and one measurement of CPU, wall time, or queue depth.</p></div></details>
+        <details class="gate"><summary>2 · Networking — traced request gate</summary><div><p>Trace one slow request across DNS, connection, handler and dependency time. Then sketch a Hello Interview design answer: requirements, timeout policy, bottleneck and tradeoff.</p><p><strong>Keep:</strong> one trace or timing table and the reason the request waited.</p></div></details>
+        <details class="gate"><summary>3 · Redis and caching — cache correctness gate</summary><div><p>Solve <a href="https://leetcode.com/problems/lru-cache/">LRU Cache</a>, then add TTL or invalidation to a small cache. Test a stale read, eviction, or a cache stampede.</p><p><strong>Keep:</strong> the map-plus-list invariant, complexity, and the test that shows the failure mode.</p></div></details>
+        <details class="gate"><summary>4 · Memory layout — representation gate</summary><div><p>Implement the same record set as pointer-heavy objects and packed storage. Measure allocation and traversal; explain which result comes from bytes, indirection, or locality.</p><p><strong>Keep:</strong> a two-row measurement table and one sentence that would change if the records became mutable.</p></div></details>
+        <details class="gate"><summary>5 · Postgres — temporal state gate</summary><div><p>Solve <a href="https://leetcode.com/problems/time-based-key-value-store/">Time Based Key-Value Store</a>, then compare a sequential scan and an index-backed Postgres query with <code>EXPLAIN (ANALYZE, BUFFERS)</code>.</p><p><strong>Keep:</strong> the query plan, selectivity assumption, and the difference between lookup, visibility and durability.</p></div></details>
+        <details class="gate"><summary>6 · Distributed failure — uncertain-outcome gate</summary><div><p>Design a job scheduler, rate limiter, or queue worker from the Hello Interview breakdowns. Kill a worker after its effect succeeds but before acknowledgement, then prove retry does not duplicate the effect.</p><p><strong>Keep:</strong> a state diagram, idempotency key, and restart test result.</p></div></details>
+        <details class="gate"><summary>7 · Transformer execution — shape-and-timing gate</summary><div><p>Trace one small-model prompt. Write down tensor shapes through attention, then time prefill and decode separately as prompt or output length changes.</p><p><strong>Keep:</strong> the shape worksheet, two timings, and the explanation for KV reuse.</p></div></details>
+        <details class="gate"><summary>8 · Inference serving — admission-policy gate</summary><div><p>Use the serving simulator to compare two scheduling policies under a fixed KV-cache capacity. Reject or queue requests explicitly and explain the TTFT/p99 tradeoff.</p><p><strong>Keep:</strong> a metrics table and the policy decision you would make for an interactive product.</p></div></details>
+        <details class="gate"><summary>9 · Harness quality — replay gate</summary><div><p>Run five fixed cases, interrupt after a tool succeeds, restart, and replay all five. Treat a duplicate external effect or missing provenance as a failed gate.</p><p><strong>Keep:</strong> the durable-step record, replay results, and the regression you would block.</p></div></details>
+      </div>
+    </section>
+
+    <section class="layer" id="layer-1" data-layer data-path="systems interview factory">
+      <div class="layer-head"><span class="number">1</span><div><h2>Machine performance &amp; operating systems</h2><p>Build the vocabulary needed to say where time and memory went.</p></div><span class="status">Not started</span></div>
+      <div class="columns">
+        <div class="column">
+          <p class="column-label">Study</p>
+          <article class="resource"><h3><a href="https://csapp.cs.cmu.edu/2e/ch6-preview.pdf">CS:APP Chapter 6 — Memory Hierarchy</a></h3><p>Read §6.1–6.3 for storage and hierarchy, §6.4–6.5 for caches/locality, and §6.6 for measured performance impact.</p><p class="meta">Covers: cache lines, locality, CPU↔memory gap. It does not cover processes or threads.</p></article>
+          <article class="resource"><h3><a href="https://pages.cs.wisc.edu/~remzi/OSTEP/">Operating Systems: Three Easy Pieces</a></h3><p>Read chapters 4 (Processes) → 5 (Process API) → 6 (Limited Direct Execution) → 7 (Scheduling), then 13 (Address Spaces), 18 (Paging), 21 (Swapping), 26 (Concurrency and Threads), 27 (Thread API), 30 (Condition Variables), and 36 (I/O Devices).</p><p class="meta">Core: process state, virtual memory, threads, synchronization, scheduling and I/O.</p></article>
+        </div>
+        <div class="column">
+          <p class="column-label">Prove it in code</p>
+          <article class="lab-step"><h3>Memory-stride benchmark</h3><p>Write a tiny Go, Python, C, or Rust program that walks one large array with different jump sizes. A stride is the jump size: stride 1 visits neighbors; stride 8 skips seven elements between visits. Your job is to discover how runtime per visited element changes as the stride grows. Do not check this off until you save your result table and your explanation.</p></article>
+          <article class="lab-step"><h3>Blocking versus waiting</h3><p>Compare CPU time and wall time for a busy loop, <code>sleep</code>, and a blocking socket read. Observe them with <code>time</code> and your OS process monitor.</p></article>
+        </div>
+      </div>
+      <div class="checkpoint"><strong>Exit test: explain why fewer instructions need not mean faster execution.</strong><div class="checklist"><label><input type="checkbox">CS:APP sections read</label><label><input type="checkbox">OSTEP selections read</label><label><input type="checkbox">Stride benchmark table saved</label><label><input type="checkbox">Blocking/waiting explained</label></div></div>
+    </section>
+
+    <section class="layer" id="layer-2" data-layer data-path="systems interview factory">
+      <div class="layer-head"><span class="number">2</span><div><h2>Networking &amp; request flow</h2><p>Follow one request from a name to a response under load, then use traces to explain the result.</p></div><span class="status">Not started</span></div>
+      <div class="columns">
+        <div class="column"><p class="column-label">Study</p>
+          <article class="resource"><h3><a href="https://backend-from-first-principle.vercel.app/">Backend from First Principles</a></h3><p>Read HTTP &amp; CORS → routing → serialization → REST API design → concurrency → scaling → observability → graceful shutdown → fault tolerance.</p></article>
+          <article class="resource"><h3><a href="https://howdns.works/">How DNS Works</a> + <a href="https://opentelemetry.io/docs/concepts/signals/traces/">OpenTelemetry traces</a></h3><p>Understand recursive lookup, caches and TTL; then use traces to locate DNS, connection, handler, database, queue or downstream waiting time.</p></article>
+        </div>
+        <div class="column"><p class="column-label">Prove it in code</p>
+          <article class="lab-step"><h3>Instrumented service</h3><p>Build a Go or Python HTTP service with request IDs, phase timings, a deliberately slow endpoint, deadlines, cancellation and graceful shutdown. Load it with <code>hey</code> or <code>wrk</code>.</p><pre><code>name → DNS → TCP → TLS → HTTP
+     → load balancer → handler → dependency → response</code></pre></article>
+          <article class="lab-step"><h3>Trace a live failure</h3><p>Use <code>dig +trace</code>, then delay or fail one dependency. Explain what was cached, where the request waited and whether cancellation or retry changed the outcome. Reuse this instrumentation for the later harness.</p></article>
+        </div>
+      </div>
+      <div class="checkpoint"><strong>Exit test: locate waiting time in DNS, connection setup, a queue, the handler, or a downstream service.</strong><div class="checklist"><label><input type="checkbox">Required backend chapters read</label><label><input type="checkbox">DNS trace explained</label><label><input type="checkbox">Load test captured</label><label><input type="checkbox">Timeout/shutdown tested</label></div></div>
+    </section>
+
+    <section class="layer" id="layer-3" data-layer data-path="systems interview factory">
+      <div class="layer-head"><span class="number">3</span><div><h2>Redis, caching &amp; event loops</h2><p>See how one thread multiplexes many clients—and how blocking ruins it.</p></div><span class="status">Not started</span></div>
+      <div class="columns">
+        <div class="column"><p class="column-label">Study</p>
+          <article class="resource"><h3><a href="https://backend-from-first-principle.vercel.app/">Backend chapter 09 — Caching</a></h3><p>Learn cache-aside, TTL, eviction, invalidation, stampedes, hot keys, and consistency tradeoffs.</p></article>
+          <article class="resource"><h3><a href="https://redis.io/docs/latest/operate/oss_and_stack/reference/internals/internals-rediseventlib/">Redis event library</a></h3><p>A conceptual explanation of non-blocking sockets, polling, timers and Redis’s event loop. It is historical, so use it for the mechanism—not current implementation detail.</p></article>
+          <article class="resource"><h3><a href="https://redis.io/docs/latest/develop/reference/clients/">Redis client handling</a> + <a href="https://redis.io/docs/latest/develop/using-commands/pipelining/">pipelining</a></h3><p>Connect the event loop to actual TCP client behavior, buffers, RTT and batching.</p></article>
+        </div>
+        <div class="column"><p class="column-label">Prove it in code</p>
+          <article class="lab-step"><h3>Toy TCP key-value server</h3><p>Implement <code>SET</code>, <code>GET</code>, and TTL with one event loop. Track active clients, commands/second and p95/p99 latency.</p></article>
+          <article class="lab-step"><h3>Break the event loop</h3><p>Add <code>SLOW 500</code>, which blocks for 500 ms. Run concurrent clients and show how an unrelated <code>GET</code> inherits the delay. Then move slow work off the loop.</p><pre><code>readable socket → parse → execute → buffer response
+                     ↑ one blocking command stalls all</code></pre></article>
+        </div>
+      </div>
+      <div class="checkpoint"><strong>Exit test: explain Redis speed without saying only “because RAM.”</strong><div class="checklist"><label><input type="checkbox">Caching chapter read</label><label><input type="checkbox">Event loop traced</label><label><input type="checkbox">Toy server works</label><label><input type="checkbox">Tail-latency failure measured</label></div></div>
+    </section>
+
+    <section class="layer" id="layer-4" data-layer data-path="systems interview factory">
+      <div class="layer-head"><span class="number">4</span><div><h2>Cache memory-layout case study</h2><p>Transfer Layer 1 into a production DNS cache.</p></div><span class="status">Not started</span></div>
+      <div class="columns">
+        <div class="column"><p class="column-label">Study</p><article class="resource"><h3><a href="https://blog.cloudflare.com/dns-cache-memory-optimization-1111/">Cloudflare — How we saved 100 TB in the 1.1.1.1 DNS cache</a></h3><p>Classify each optimization by allocator overhead, padding, representation, pointer chasing, contiguity and cache locality.</p><p class="meta">Read here—not as your DNS introduction.</p></article></div>
+        <div class="column"><p class="column-label">Prove it in code</p><article class="lab-step"><h3>Representation benchmark</h3><p>Model the same records using pointer-heavy objects and packed contiguous storage. Measure allocated bytes and traversal time. In Rust, compare struct sizes with <code>size_of</code>; in Go, use benchmarks and <code>-benchmem</code>.</p></article></div>
+      </div>
+      <div class="checkpoint"><strong>Exit test: identify three article changes and say whether each reduces bytes, indirection, or cache misses.</strong><div class="checklist"><label><input type="checkbox">Article annotated</label><label><input type="checkbox">Three changes classified</label><label><input type="checkbox">Two layouts implemented</label><label><input type="checkbox">Memory/time compared</label></div></div>
+    </section>
+
+    <section class="layer" id="layer-5" data-layer data-path="systems interview factory">
+      <div class="layer-head"><span class="number">5</span><div><h2>Postgres &amp; durable state</h2><p>Move from cached answers to authoritative, recoverable data.</p></div><span class="status">Not started</span></div>
+      <div class="columns">
+        <div class="column"><p class="column-label">Study</p>
+          <article class="resource"><h3><a href="https://backend-from-first-principle.vercel.app/">Backend chapter 08 — Databases</a></h3><p>Use it as orientation, then move to canonical documentation.</p></article>
+          <article class="resource"><h3>PostgreSQL official docs</h3><p>Read <a href="https://www.postgresql.org/docs/current/using-explain.html">EXPLAIN</a> → <a href="https://www.postgresql.org/docs/current/indexes.html">Indexes</a> → <a href="https://www.postgresql.org/docs/current/mvcc.html">MVCC</a> → <a href="https://www.postgresql.org/docs/current/wal-intro.html">WAL</a>.</p></article>
+        </div>
+        <div class="column"><p class="column-label">Prove it in code</p>
+          <article class="lab-step"><h3>Query-plan experiment</h3><p>Create enough rows to compare sequential and index scans. Vary selectivity. Use <code>EXPLAIN (ANALYZE, BUFFERS)</code> and explain why an index is not always selected.</p></article>
+          <article class="lab-step"><h3>Two-session MVCC experiment</h3><p>Hold a transaction open in session A; update/read in session B. Repeat at different isolation levels. Record which versions are visible and when blocking occurs.</p></article>
+        </div>
+      </div>
+      <div class="checkpoint"><strong>Exit test: explain how MVCC, indexes and WAL solve different problems.</strong><div class="checklist"><label><input type="checkbox">Core docs read</label><label><input type="checkbox">Plans compared</label><label><input type="checkbox">Isolation behavior reproduced</label><label><input type="checkbox">Recovery path explained</label></div></div>
+    </section>
+
+    <section class="layer" id="layer-6" data-layer data-path="systems interview factory">
+      <div class="layer-head"><span class="number">6</span><div><h2>Queues, streaming &amp; distributed failure</h2><p>Reason about overload, duplicate delivery, backfills and uncertain outcomes instead of happy-path topology.</p></div><span class="status">Not started</span></div>
+      <div class="columns">
+        <div class="column"><p class="column-label">Study</p>
+          <article class="resource"><h3><a href="https://backend-from-first-principle.vercel.app/">Backend chapters 10, 13 and 23</a></h3><p>Task queues → gRPC → message brokers/Kafka. Focus on delivery semantics, deadlines, ordering, replay, backpressure, idempotent consumers and dead-letter handling.</p></article>
+          <article class="resource"><h3><a href="https://raft.github.io/raft.pdf">In Search of an Understandable Consensus Algorithm</a></h3><p>Read Raft for replicated state, leader election, terms and log agreement. Know its design tradeoffs before using it in a system-design interview.</p></article>
+        </div>
+        <div class="column"><p class="column-label">Prove it in code</p>
+          <article class="lab-step"><h3>Persistent job and sensor-event queue</h3><p>Model queued, leased, succeeded and failed states. Add lease expiry, retry limits, idempotency keys, an out-of-order sensor event and a bounded backfill/replay.</p></article>
+          <article class="lab-step"><h3>Ambiguous-success and replay test</h3><p>Kill the worker after completing the operation but before acknowledging it. Verify that retry does not repeat the effect; replay a bounded event window and explain how you avoid duplicate downstream decisions.</p><pre><code>work succeeds → ACK is lost → caller retries
+                         ↓
+             idempotency decides safety</code></pre></article>
+        </div>
+      </div>
+      <div class="checkpoint"><strong>Exit test: answer “the caller timed out—did the operation happen?” without guessing, then explain how a backfill avoids replaying an already-applied effect.</strong><div class="checklist"><label><input type="checkbox">Queue/gRPC/broker chapters read</label><label><input type="checkbox">Raft read</label><label><input type="checkbox">State transitions tested</label><label><input type="checkbox">Retry is idempotent</label></div></div>
+    </section>
+
+    <section class="focus-panel secondary-course-material" id="ml-bridge" aria-labelledby="ml-bridge-title">
+      <p class="eyebrow">Required before Layer 7 · bounded bridge</p>
+      <h2 id="ml-bridge-title">ML execution bridge: from loss to transformer mechanics.</h2>
+      <p>You already have classical-ML notes. Do not restart that curriculum. Close the four gaps that connect it to transformer execution: multilayer backpropagation, non-convex optimization, regularization, and multiclass softmax. This is a prerequisite for Layer 7, not a tenth layer and not a new progress score.</p>
+      <div class="practice-grid">
+        <article class="practice-card"><h3>Reconnect your base</h3><p>Review your Phase 1 synthesis and identify the four stated gaps. Keep the question operational: which values are needed in the forward pass so the backward pass can compute every parameter gradient?</p><p class="practice-links"><a href="obsidian://open?vault=SakethVault&amp;file=_wiki%2Fcs%2Fphase-1-deep-learning.md">Your Phase 1 summary</a><a href="obsidian://open?vault=SakethVault&amp;file=_wiki%2Fcs%2Fargmax-and-softmax-functions-in-neural-networks.md">Your softmax note</a></p></article>
+        <article class="practice-card"><h3>Learn the mechanism</h3><p>Use one explanation of backprop as local gradient flow, then verify your implementation against an autograd engine. Read for the mechanism, not for framework fluency.</p><p class="practice-links"><a href="https://cs231n.github.io/optimization-2/">CS231n backpropagation</a><a href="https://docs.pytorch.org/tutorials/beginner/basics/autogradqs_tutorial.html">PyTorch autograd</a><a href="https://docs.pytorch.org/tutorials/beginner/basics/optimization_tutorial.html">PyTorch optimization loop</a></p></article>
+        <article class="practice-card"><h3>Why serving depends on this</h3><p>Training retains activations for backward computation; inference discards gradients and retains K/V for future tokens. That difference explains why model execution, memory capacity, and serving policy are linked.</p><p class="practice-links"><a href="obsidian://open?vault=SakethVault&amp;file=_wiki%2Fcs%2Fkv-caching-and-memory-considerations-in-transformers.md">Your KV-cache note</a><a href="#layer-7">Continue to Layer 7</a></p></article>
+      </div>
+      <div class="gate-list" aria-label="ML execution bridge evidence">
+        <details class="gate"><summary>Proof 1 · hand-written multilayer backpropagation</summary><div><p>Implement a tiny NumPy MLP with one hidden layer: forward pass, ReLU or tanh, logits, numerically stable softmax-cross-entropy, and backward gradients for every parameter.</p><p><strong>Keep:</strong> tensor shapes and a finite-difference gradient check. Explain one gradient accumulation point where <code>+=</code> is necessary.</p></div></details>
+        <details class="gate"><summary>Proof 2 · training, validation, and regularization</summary><div><p>Train the MLP on a small multiclass dataset. First deliberately overfit a small slice, then compare a validation result after changing one control: weight decay, dropout, data size, batch size, or learning rate.</p><p><strong>Keep:</strong> train/validation curves or a compact metrics table, the changed assumption, and why the loss curve alone was insufficient.</p></div></details>
+        <details class="gate"><summary>Proof 3 · bridge the computation graph to attention</summary><div><p>Write the shapes for embeddings → Q/K/V projections → attention scores → softmax → weighted values. State what training stores for backward computation and what autoregressive inference stores in the KV cache.</p><p><strong>Keep:</strong> one annotated diagram and the memory tradeoff that Layer 8 will turn into an admission-control decision.</p></div></details>
+      </div>
+    </section>
+
+    <section class="focus-panel secondary-course-material" id="safety-control" aria-labelledby="safety-control-title">
+      <p class="eyebrow">Cross-cutting · start after Layer 6</p>
+      <h2 id="safety-control-title">Safety and control: the AI suggests; your code decides.</h2>
+      <p>This is not a separate theory course. Build a small control plane around an agent: it can propose a typed action, but deterministic rules decide whether to allow it, ask a person, or refuse. Carry this pattern through inference serving and harness work.</p>
+      <div class="practice-grid">
+        <article class="practice-card"><h3>The plain model</h3><p>Input can be wrong or malicious. The model proposes one action. Your code checks explicit rules. A safe action runs; an important action waits for approval; an unknown action is refused. Every decision leaves a receipt.</p><p class="practice-links"><a href="obsidian://open?vault=SakethVault&amp;file=_wiki%2Fcs%2Feval-gates-staging-risky-actions.md">Your eval-gate note</a><a href="obsidian://open?vault=SakethVault&amp;file=_wiki%2Fcs%2Fcontract-strictness-by-consequence.md">Your contract note</a></p></article>
+        <article class="practice-card"><h3>Three kinds of tool</h3><p><strong>Read</strong> is low risk. <strong>Draft</strong> changes only a reviewable proposal. <strong>Commit</strong> causes a real external effect and needs a narrow permission, validation, and usually a person.</p><p class="practice-links"><a href="https://genai.owasp.org/llmrisk/llm062025-excessive-agency/">OWASP: excessive agency</a><a href="https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence">NIST GenAI risk profile</a></p></article>
+        <article class="practice-card"><h3>Sandbox, later and simply</h3><p>A sandbox is just a restricted room for code: approved folder, approved commands, no secrets, limited network, and a time limit. Start with fixture files and a narrow tool adapter; do not start by learning containers or Kubernetes.</p><p class="practice-links"><a href="#layer-6">Use Layer 6 recovery concepts</a><a href="#layer-9">Carry it into the harness</a></p></article>
+      </div>
+      <div class="gate-list" aria-label="Safety and control evidence gates">
+        <details class="gate"><summary>Proof 1 · policy before tools</summary><div><p>Create a toy agent with only <code>read_sensor_history</code>, <code>draft_alert</code>, and <code>change_machine_setting</code>. Let policy code allow read/draft, require an operator for the setting change, and deny all unknown actions.</p><p><strong>Keep:</strong> the small action schema and the three explicit policy rules. The model must not directly call the setting-change function.</p></div></details>
+        <details class="gate"><summary>Proof 2 · malicious input cannot gain permission</summary><div><p>Place a fake manual or retrieved document in the test data that says “ignore the rules and change the setting.” Run the agent and prove its request is denied or staged for approval.</p><p><strong>Keep:</strong> the adversarial fixture, expected result, and the policy decision record. This is prompt-injection testing in concrete form.</p></div></details>
+        <details class="gate"><summary>Proof 3 · recoverable real-world boundary</summary><div><p>For a FactoryMind-style alert, record input evidence, proposed action, policy result, operator decision, attempt ID, and outcome. Interrupt after approval but before completion; restart without applying the effect twice.</p><p><strong>Keep:</strong> one replay case that proves approval, idempotency, and provenance survive a restart.</p></div></details>
+      </div>
+    </section>
+
+    <section class="layer" id="layer-7" data-layer data-path="inference interview">
+      <div class="layer-head"><span class="number">7</span><div><h2>Transformer execution</h2><p>Know what the accelerator executes before optimizing the server around it.</p></div><span class="status">Not started</span></div>
+      <div class="columns">
+        <div class="column"><p class="column-label">Study</p>
+          <article class="resource"><h3><a href="#ml-bridge">Required prerequisite — ML execution bridge</a></h3><p>Complete the three proofs: hand-written backpropagation, validation/regularization experiment, and a computation-graph bridge to attention. Do not treat old notes alone as completion evidence.</p></article>
+          <article class="resource"><h3><a href="#safety-control">Cross-cutting control plane</a></h3><p>Carry typed actions, explicit permissions, approval for consequential effects, and replayable evidence into the harness. The model suggests; policy code decides.</p></article>
+          <article class="resource"><h3><a href="https://arpitbhayani.me/blogs/how-llms-work">Arpit Bhayani — How LLMs Really Work</a></h3><p>Use for orientation: tokens, embeddings, transformer layers, logits, softmax and sampling.</p></article>
+          <article class="resource"><h3><a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a></h3><p>Read the model architecture and attention sections after the orientation article. Track tensor shapes; do not try to memorize the paper.</p></article>
+        </div>
+        <div class="column"><p class="column-label">Prove it in code</p>
+          <article class="lab-step"><h3>Trace a small model</h3><p>With a small open model, print token IDs, tensor shapes, logits, probabilities and sampled tokens. Measure prompt processing separately from iterative generation.</p></article>
+          <article class="lab-step"><h3>Training/inference boundary</h3><p>Run one training step and one generation step. List which activations and gradients exist in each and why inference can reuse keys/values.</p></article>
+        </div>
+      </div>
+      <div class="checkpoint"><strong>Exit test: draw training and inference as different execution/data-flow graphs.</strong><div class="checklist"><label><input type="checkbox">Orientation read</label><label><input type="checkbox">Attention shapes traced</label><label><input type="checkbox">Prefill/decode timed</label><label><input type="checkbox">KV reuse explained</label></div></div>
+    </section>
+
+    <section class="layer" id="layer-8" data-layer data-path="inference interview factory">
+      <div class="layer-head"><span class="number">8</span><div><h2>LLM inference engineering</h2><p>Optimize latency, throughput and memory under concurrent demand.</p></div><span class="status">Not started</span></div>
+      <div class="columns">
+        <div class="column"><p class="column-label">Study</p>
+          <article class="resource"><h3>1. <a href="https://www.usenix.org/conference/osdi22/presentation/yu">Orca</a></h3><p>Iteration-level scheduling and selective batching.</p></article>
+          <article class="resource"><h3>2. <a href="https://arxiv.org/abs/2309.06180">PagedAttention / vLLM</a></h3><p>Block-based KV-cache allocation inspired by virtual memory and paging.</p></article>
+          <article class="resource"><h3>3. <a href="https://www.microsoft.com/en-us/research/uploads/prod/2023/09/sarathi_preprint.pdf">Sarathi</a></h3><p>Chunked prefills, decode piggybacking and prefill/decode interference.</p></article>
+        </div>
+        <div class="column"><p class="column-label">Prove it in code</p>
+          <article class="lab-step"><h3>Serving-policy simulator</h3><p>Generate requests with prompt length, output length and arrival time. Compare request-at-a-time, static batching, continuous batching and chunked prefill.</p></article>
+          <article class="lab-step"><h3>Measure all four dimensions</h3><p>Report time to first token, inter-token latency, total tokens/second and p99 latency. Add a fixed KV-cache capacity and reject/admit requests explicitly.</p><pre><code>prefill: parallel tokens → often compute-bound
+decode: one token/sequence → often bandwidth-bound</code></pre></article>
+        </div>
+      </div>
+      <div class="checkpoint"><strong>Exit test: explain why maximum throughput may produce unacceptable interactive latency.</strong><div class="checklist"><label><input type="checkbox">Orca understood</label><label><input type="checkbox">PagedAttention understood</label><label><input type="checkbox">Sarathi understood</label><label><input type="checkbox">Policies compared with metrics</label></div></div>
+    </section>
+
+    <section class="layer" id="layer-9" data-layer data-path="inference interview factory">
+      <div class="layer-head"><span class="number">9</span><div><h2>Agent harness engineering</h2><p>Transfer backend and inference mechanisms into recoverable, evaluated agent execution.</p></div><span class="status">Not started</span></div>
+      <div class="columns">
+        <div class="column"><p class="column-label">Study</p>
+          <article class="resource"><h3><a href="https://opentelemetry.io/docs/concepts/signals/traces/">OpenTelemetry traces</a></h3><p>Learn spans, parent/child causality and context propagation. Use tracing to reconstruct decisions and tool calls.</p></article>
+          <article class="resource"><h3>Transfer—not another framework course</h3><p>Reuse admission control, scheduling, persistent state, idempotency, caching, backpressure and observability from earlier layers.</p></article>
+        </div>
+        <div class="column"><p class="column-label">Prove it in code</p>
+          <article class="lab-step"><h3>Recoverable agent state machine</h3><p>Represent each inference and tool call as a durable step with inputs, outputs, status, attempt count and idempotency key.</p><pre><code>request → context → inference → tool → observation
+   ↑                                   ↓
+   └──── durable state / retry / stop ─┘</code></pre></article>
+          <article class="lab-step"><h3>Replay and restart test</h3><p>Keep five fixed task cases with expected tool outputs. Interrupt execution after the external tool succeeds but before the next model call; restart, prove the side effect is not repeated, then replay all five cases for quality, cost and latency regressions.</p></article>
+        </div>
+      </div>
+      <div class="checkpoint"><strong>Exit test: resume an interrupted run without losing provenance or repeating a completed external action.</strong><div class="checklist"><label><input type="checkbox">Trace model defined</label><label><input type="checkbox">Durable steps implemented</label><label><input type="checkbox">Restart tested</label><label><input type="checkbox">Duplicate side effect prevented</label></div></div>
+    </section>
+
+    <section class="focus-panel secondary-course-material" id="reading-desk" aria-labelledby="reading-desk-title">
+      <p class="eyebrow">Reading desk</p>
+      <h2 id="reading-desk-title">Read production evidence, not an endless feed.</h2>
+      <p>Each week: one production post and one inference or research post. Capture the system, constraint, metric, tradeoff and FactoryMind transfer in your learning log.</p>
+      <div class="track-grid">
+        <article class="track-card"><h3>Production systems</h3><ul><li><a href="https://blog.cloudflare.com/">Cloudflare engineering</a></li><li><a href="https://eng.uber.com/">Uber Engineering</a></li><li><a href="https://newsletter.pragmaticengineer.com/about">The Pragmatic Engineer</a></li></ul></article>
+        <article class="track-card"><h3>Inference and agents</h3><ul><li><a href="https://vllm.ai/blog/">vLLM engineering</a></li><li><a href="https://www.latent.space/">Latent Space</a></li><li><a href="https://theaiengineer.substack.com/">The AI Engineer</a></li><li><a href="https://lilianweng.github.io/">Lil’Log</a></li></ul></article>
+        <article class="track-card"><h3>System design and edge</h3><ul><li><a href="https://systemdesign.one/">System Design Newsletter</a></li><li><a href="https://designgurus.substack.com/">System Design Nuggets</a></li><li><a href="https://insideembedded.substack.com/">Inside Embedded</a></li><li><a href="https://eugeneyan.com/writing/">Eugene Yan</a></li><li>X: <a href="https://x.com/vllm_project">@vllm_project</a> for serving releases and experiments</li></ul></article>
+      </div>
+    </section>
+
+    <section class="tab-ledger secondary-course-material" id="tabs">
+      <p class="eyebrow">Close tabs with evidence</p>
+      <h2>Existing-resource ledger</h2>
+      <table>
+        <thead><tr><th>Resource</th><th>Use</th><th>Close when</th><th>Decision</th></tr></thead>
+        <tbody>
+          <tr><td>Backend from First Principles</td><td>Layers 2, 3, 5 and 6</td><td>Layer 6 exit test passes</td><td class="keep">Keep</td></tr>
+          <tr><td>Cloudflare DNS-cache article</td><td>Layer 4</td><td>Three optimizations are classified and benchmarked</td><td class="keep">Keep</td></tr>
+          <tr><td>Arpit’s LLM article</td><td>Layer 7</td><td>Transformer execution can be drawn from tokens to sampling</td><td class="keep">Keep</td></tr>
+          <tr><td>breakscale.tech</td><td>No separate role if it duplicates/redirects to the backend curriculum</td><td>After confirming duplication</td><td class="close">Close duplicate</td></tr>
+          <tr><td>solacc.vercel.app</td><td>Interview practice; unrelated to this path</td><td>Now</td><td class="close">Close</td></tr>
+          <tr><td>X posts</td><td>Unverified discovery pointers</td><td>After saving any useful source link they reference</td><td>Defer</td></tr>
+          <tr><td>Orca / PagedAttention / Sarathi</td><td>Layer 8</td><td>Serving-policy simulator explains their mechanisms</td><td class="keep">Keep later</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer><div class="shell">
+    <div class="progress-tools">
+      <button id="export-progress" type="button">Export progress</button>
+      <button id="choose-progress" type="button">Import progress</button>
+      <input id="import-progress" type="file" accept="application/json,.json" hidden>
+      <p id="progress-message" role="status">Moving from the saved HTML file? Export there, then import here. Progress is separate for each browser address.</p>
+    </div>
+    <dialog id="import-confirm" aria-labelledby="import-title"><h2 id="import-title">Replace progress on this site?</h2><p id="import-diff"></p><button id="import-apply" type="button">Replace progress</button> <button id="import-cancel" type="button">Cancel</button></dialog>
+Progress is stored only in this browser via local storage. The curriculum remains usable with JavaScript disabled; only progress persistence is lost.</div></footer>
+
+  <script>
+    (() => {
+      const boxes = [...document.querySelectorAll('[data-layer] input[type="checkbox"]')];
+      const legacyStorageKey = 'systems-inference-curriculum-v1';
+      const storageKey = 'systems-inference-curriculum-v2';
+      const emptyProgress = () => boxes.map(() => ({done: false, completed_at: null}));
+      const layers = [...document.querySelectorAll('[data-layer]')].map((layer, index) => ({
+        id: layer.id,
+        index,
+        element: layer,
+        title: layer.querySelector('.layer-head h2').textContent,
+        boxes: [...layer.querySelectorAll('input[type="checkbox"]')]
+      }));
+
+      layers.forEach(layer => {
+        const checkpoint = layer.element.querySelector('.checkpoint');
+        const question = checkpoint.querySelector('strong');
+        question.textContent = `Completion question — answer in your learning log: ${question.textContent.replace(/^Exit test:\s*/, '')}`;
+        const instruction = document.createElement('p');
+        instruction.className = 'checkpoint-instruction';
+        instruction.textContent = 'Do the study and project below first. Then answer this one question in your own words and tick only the evidence items that are true.';
+        question.after(instruction);
+        layer.element.querySelector('.layer-head').after(checkpoint);
+      });
+
+      function validV2(value) {
+        const validTimestamp = timestamp => timestamp === null || (typeof timestamp === 'string' && !Number.isNaN(Date.parse(timestamp)));
+        const validCheckpoint = item => item && typeof item.done === 'boolean' && validTimestamp(item.completed_at) && (item.done || item.completed_at === null);
+        return value && value.schema_version === 2 && value.storage_key === storageKey && Array.isArray(value.checkpoints) && value.checkpoints.length === boxes.length && value.checkpoints.every(validCheckpoint);
+      }
+      function legacyToV2(value) {
+        return value.map(done => ({done: Boolean(done), completed_at: null}));
+      }
+      function loadProgress() {
+        try {
+          const current = JSON.parse(localStorage.getItem(storageKey) || 'null');
+          if (validV2(current)) return current.checkpoints;
+          const legacy = JSON.parse(localStorage.getItem(legacyStorageKey) || 'null');
+          if (Array.isArray(legacy) && legacy.length === boxes.length && legacy.every(value => typeof value === 'boolean')) return legacyToV2(legacy);
+        } catch (_) {}
+        return emptyProgress();
+      }
+      let progress = loadProgress();
+      let activeLayerId = layers.find(layer => !layer.boxes.every(box => progress[boxes.indexOf(box)].done))?.id || layers[0].id;
+      boxes.forEach((box, index) => {
+        box.checked = progress[index].done;
+        box.addEventListener('change', () => {
+          progress[index] = {done: box.checked, completed_at: box.checked ? new Date().toISOString() : null};
+          updateView(true);
+        });
+      });
+
+      const outline = document.getElementById('course-outline-list');
+      const history = document.getElementById('learning-history-list');
+      const historyEmpty = document.getElementById('learning-history-empty');
+      const homeDescription = document.getElementById('course-home-description');
+      const homeStep = document.getElementById('course-home-step');
+      const homeCount = document.getElementById('course-home-count');
+      const homeStatus = document.getElementById('course-home-status');
+      const openCurrent = document.getElementById('open-current-lesson');
+
+      function layerState(layer) {
+        const selected = layer.boxes.filter(box => progress[boxes.indexOf(box)].done).length;
+        return {selected, total: layer.boxes.length, complete: selected === layer.boxes.length, started: selected > 0};
+      }
+      function formatDate(value) {
+        return new Intl.DateTimeFormat(undefined, {month: 'short', day: 'numeric', year: 'numeric'}).format(new Date(value));
+      }
+      function renderOutline() {
+        const fragment = document.createDocumentFragment();
+        layers.forEach(layer => {
+          const state = layerState(layer);
+          const row = document.createElement('button');
+          row.type = 'button'; row.className = 'module-row'; row.dataset.layerId = layer.id;
+          row.dataset.state = state.complete ? 'complete' : state.started ? 'started' : 'not-started';
+          row.setAttribute('aria-current', String(layer.id === activeLayerId));
+          const status = state.complete ? 'Complete' : state.started ? 'In progress' : 'Not started';
+          row.innerHTML = `<span class="module-number">${layer.index + 1}</span><span><strong>${layer.title}</strong><span>${state.selected} of ${state.total} selected</span></span><span class="module-state">${status}</span><span class="module-arrow" aria-hidden="true">›</span>`;
+          row.addEventListener('click', () => selectLayer(layer.id, true));
+          fragment.append(row);
+        });
+        outline.replaceChildren(fragment);
+      }
+      function renderHistory() {
+        const fragment = document.createDocumentFragment();
+        let count = 0;
+        layers.forEach(layer => {
+          const completed = layer.boxes.filter(box => progress[boxes.indexOf(box)].done);
+          if (!completed.length) return;
+          const group = document.createElement('article'); group.className = 'history-group';
+          const heading = document.createElement('h3'); heading.textContent = layer.title; group.append(heading);
+          completed.forEach(box => {
+            const item = document.createElement('div'); item.className = 'history-item';
+            const index = boxes.indexOf(box); const date = progress[index].completed_at;
+            item.innerHTML = `<span>${box.parentElement.textContent.trim()}<small>${date ? `Selected ${formatDate(date)}` : 'Previously marked complete — date unavailable'}</small></span>`;
+            group.append(item); count++;
+          });
+          fragment.append(group);
+        });
+        history.replaceChildren(fragment); historyEmpty.hidden = count > 0;
+      }
+      function renderHome() {
+        const nextLayer = layers.find(layer => !layerState(layer).complete) || layers[layers.length - 1];
+        const state = layerState(nextLayer);
+        const nextBox = nextLayer.boxes.find(box => !progress[boxes.indexOf(box)].done);
+        homeDescription.textContent = `Layer ${nextLayer.index + 1}: ${nextLayer.title}`;
+        homeStep.textContent = nextBox ? `Next step: ${nextBox.parentElement.textContent.trim()}` : 'All checkpoints are selected. Use the exit question to decide what to revisit.';
+        homeCount.textContent = `${state.selected} / ${state.total}`;
+        homeStatus.textContent = state.complete ? 'Layer complete' : 'Layer progress';
+        openCurrent.href = `#${nextLayer.id}`;
+        openCurrent.textContent = state.complete ? 'Review this lesson' : 'Open lesson and update progress';
+        openCurrent.onclick = event => { event.preventDefault(); selectLayer(nextLayer.id, true); };
+      }
+      function selectLayer(id, scroll) {
+        activeLayerId = id;
+        layers.forEach(layer => layer.element.classList.toggle('active-course-layer', layer.id === id));
+        renderOutline();
+        renderWorkspace();
+        if (scroll) document.getElementById('learning-workspace').scrollIntoView({behavior: 'smooth', block: 'start'});
+      }
+      const quizKey = 'systems-inference-quiz-v1';
+      const evidenceKey = 'systems-inference-evidence-v1';
+      let evidenceNotes = (() => { try { return JSON.parse(localStorage.getItem(evidenceKey) || '{}') || {}; } catch (_) { return {}; } })();
+      let quizAttempts = (() => { try { return JSON.parse(localStorage.getItem(quizKey) || '{}') || {}; } catch (_) { return {}; } })();
+      const quizFacts = [
+        ['Cache locality makes nearby accesses cheaper than random accesses.','A cache miss can dominate instruction-count savings.','A larger stride can make each visited element slower because locality gets worse.','A thread shares an address space with sibling threads.','Virtual memory separates addresses from physical placement.','Scheduling decides which runnable work uses the CPU.','Blocking differs from busy waiting because CPU use changes.','Wall time and CPU time measure different things.','A stride benchmark exposes locality effects.','Measurement is needed before a performance conclusion.'],
+        ['DNS lookup can add waiting before a connection starts.','A timeout is a decision boundary, not proof of failure.','Tracing separates handler time from dependency time.','A queue can move waiting instead of removing it.','Connection setup and request handling are separate phases.','Cancellation needs to reach downstream work to matter.','Retries can increase load during an outage.','A request ID links work across service boundaries.','Tail latency affects user experience more than an average alone.','Graceful shutdown stops accepting work before terminating it.'],
+        ['A cache needs an invalidation or freshness policy.','TTL is a tradeoff between freshness and load.','An event loop multiplexes work without blocking the thread.','A slow command can block unrelated clients.','An LRU cache combines a map with ordering state.','Cache stampedes happen when many misses rebuild together.','Eviction means removing data under capacity pressure.','A hot key concentrates work on one item.','Caching cannot make stale data correct by itself.','Tail latency can rise during cache misses.'],
+        ['Bytes moved can matter as much as operations counted.','Indirection can create additional memory accesses.','Packed layouts can improve sequential traversal.','Mutable records can change a representation tradeoff.','Allocation rate is measurable evidence about layout.','Cache lines move nearby bytes together.','A pointer-heavy layout can increase cache misses.','A benchmark needs equivalent data for a fair comparison.','Locality is about how accesses are arranged in time and space.','Representation choices affect memory and CPU behavior.'],
+        ['An index changes how Postgres locates candidate rows.','MVCC controls which row version a transaction can see.','WAL supports recovery after a crash.','A query plan is an execution strategy.','Selectivity influences whether an index is useful.','A sequential scan can be correct and sometimes cheapest.','Durability and visibility are different guarantees.','EXPLAIN ANALYZE measures actual execution.','Isolation controls concurrent observations.','A write can be visible before it is durable.'],
+        ['A timeout can leave the caller uncertain whether work happened.','Idempotency makes repeating a request safe for its intended effect.','A lease lets work be retried after a worker disappears.','An acknowledgement can be lost after work succeeds.','A durable state transition records progress across restarts.','Backfill needs a boundary to avoid duplicate effects.','Queues trade immediate work for controlled delivery.','Retries need limits and observability.','Distributed failure includes partial success.','A state machine makes recovery decisions explicit.'],
+        ['Attention uses query, key, and value projections.','Training keeps data needed for backward computation.','Inference does not compute parameter gradients.','Prefill processes prompt tokens before generation.','Decode generates one next token at a time.','KV cache avoids recomputing prior keys and values.','Tensor shapes constrain valid matrix operations.','Softmax turns logits into a probability distribution.','Sampling chooses from the model output distribution.','Model execution and serving policy are separate concerns.'],
+        ['Throughput and interactive latency can conflict.','Time to first token measures initial responsiveness.','Inter-token latency measures generation smoothness.','A KV cache has finite capacity.','Continuous batching can improve utilization.','PagedAttention allocates KV memory in blocks.','Prefill and decode can interfere with each other.','Admission control decides what work can enter service.','p99 exposes slow requests hidden by an average.','A scheduler expresses a product latency policy.'],
+        ['A durable step records work that can be recovered.','Idempotency prevents a repeated external effect.','A trace connects model decisions and tool calls.','A replay case makes a regression observable.','Policy code must decide consequential actions.','An interrupted run needs a restart boundary.','Provenance records why an action happened.','An eval case has an expected outcome.','A tool result is not enough without its context.','A harness needs stop and recovery behavior.']
+      ];
+      // One save in flight at a time; each save names the server version it was based on (see docs/private-app/adr.md, ADR 3).
+      let serverUpdatedAt = null, dirty = false, saving = false, saveTimer = null;
+      function syncAppState() {
+        dirty = true;
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(flushAppState, 500);
+      }
+      async function flushAppState() {
+        if (saving) { saveTimer = setTimeout(flushAppState, 500); return; }
+        if (!dirty) return;
+        saving = true; dirty = false;
+        const body = {checkpoints: progress, quiz_attempts: quizAttempts, evidence_notes: evidenceNotes};
+        if (serverUpdatedAt) body.base_updated_at = serverUpdatedAt;
+        try {
+          const response = await fetch('/api/progress', {method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body), keepalive: true});
+          const state = await response.json();
+          if (response.ok) serverUpdatedAt = state.updated_at;
+          else if (response.status === 409) { dirty = false; clearTimeout(saveTimer); adoptServerState(state); showSyncNotice('Updated on another device — reloaded.'); }
+          else dirty = true;
+        } catch (_) { dirty = true; }
+        saving = false;
+      }
+      function showSyncNotice(text) {
+        const notice = document.getElementById('sync-notice');
+        notice.textContent = text; notice.hidden = false;
+        setTimeout(() => { notice.hidden = true; }, 6000);
+      }
+      function saveQuizAttempts() { try { localStorage.setItem(quizKey, JSON.stringify(quizAttempts)); localStorage.setItem(evidenceKey, JSON.stringify(evidenceNotes)); } catch (_) {} void syncAppState(); }
+      function saveEvidenceNotes() { try { localStorage.setItem(evidenceKey, JSON.stringify(evidenceNotes)); } catch (_) {} void syncAppState(); }
+      function evidenceSpec(layer, position) {
+        if (layer.index === 0 && position === 0) return {
+          label: 'Evidence question',
+          prompt: 'What are the two memory-locality ideas from CS:APP that you can use to explain a cache miss? Answer in 3-5 lines, using your own words.',
+          hint: 'Hint: say what nearby addresses and repeated accesses have to do with cache lines.'
+        };
+        if (layer.index === 0 && position === 1) return {
+          label: 'Evidence question',
+          prompt: 'Pick one OSTEP concept from the reading. What state does the OS track, and what event changes that state? Give one concrete example.',
+          hint: 'Hint: use a process, thread, page, blocking, or scheduling example.'
+        };
+        if (layer.index === 0 && position === 2) return {
+          label: 'Benchmark evidence question',
+          prompt: 'Save your table with columns: stride, elements visited, total time, ns per visited element. Then answer: at which stride did access get noticeably slower, and what memory-locality explanation fits that change?',
+          hint: 'Hint: compare measured time per visited element, not just total runtime. Use your own program output.'
+        };
+        if (layer.index === 0 && position === 3) return {
+          label: 'Proof question',
+          prompt: 'Compare busy loop, sleep, and blocking read. For each, record CPU time versus wall time. Then answer: which cases are waiting without using much CPU, and why?',
+          hint: 'Hint: wall time is elapsed time; CPU time is time spent executing on CPU.'
+        };
+        return {
+          label: 'Evidence question',
+          prompt: 'What did you build, measure, or explain for this task? Save the smallest result future-you can inspect: table, command output, link/path, or 3-5 sentence explanation.',
+          hint: 'Hint: the checkbox means the evidence is reusable, not that you merely read the card.'
+        };
+      }
+      function evidenceEditor(layer, position) {
+        const id = `${layer.id}-task-${position}`;
+        const wrap = document.createElement('div');
+        wrap.className = 'evidence-note';
+        const spec = evidenceSpec(layer, position);
+        const label = document.createElement('label');
+        label.htmlFor = `evidence-${id}`;
+        label.textContent = spec.label;
+        const area = document.createElement('textarea');
+        area.id = `evidence-${id}`;
+        area.value = evidenceNotes[id] || '';
+        area.placeholder = spec.prompt;
+        area.addEventListener('input', () => { evidenceNotes[id] = area.value.slice(0, 5000); saveEvidenceNotes(); });
+        const hint = document.createElement('small');
+        hint.textContent = `${spec.hint} This saves locally in the app database.`;
+        wrap.append(label, area, hint);
+        return wrap;
+      }
+      function noteLink(note) {
+        return `obsidian://open?vault=SakethVault&file=${encodeURIComponent(note.id)}`;
+      }
+      async function saveDecision(layer, decision, notes, panel) {
+        try {
+          const response = await fetch('/api/decisions', {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({task_id: layer.id, decision, note_ids: notes.map(note => note.id)})
+          });
+          if (!response.ok) throw new Error('Decision rejected');
+          renderCoverage(layer, panel);
+        } catch (_) {
+          panel.querySelector('.coverage-warning').textContent = 'Decision was not saved. Open the local app on this Mac and try again.';
+        }
+      }
+      async function renderCoverage(layer, panel) {
+        panel.innerHTML = '<h3>Sakethwiki coverage</h3><p>Checking your local notes...</p><p class="coverage-warning" role="status"></p>';
+        try {
+          const response = await fetch('/api/coverage');
+          if (!response.ok) throw new Error('Coverage unavailable');
+          const data = await response.json();
+          const item = data.layers.find(entry => entry.task_id === layer.id);
+          if (!item) throw new Error('Layer unavailable');
+          const notes = item.notes || [];
+          panel.innerHTML = `<h3>Sakethwiki coverage</h3><p>${notes.length ? 'You have mapped notes for this layer. Treat them as prior knowledge to review, not course completion.' : 'No mapped notes yet. Start with the course material and capture one good note after the proof task.'}</p>`;
+          if (notes.length) {
+            const list = document.createElement('ul');
+            list.className = 'coverage-notes';
+            notes.slice(0, 6).forEach(note => {
+              const li = document.createElement('li');
+              const a = document.createElement('a');
+              a.href = noteLink(note);
+              a.textContent = note.title;
+              const small = document.createElement('small');
+              small.textContent = note.entry_date || 'undated';
+              li.append(a, small);
+              list.append(li);
+            });
+            panel.append(list);
+          }
+          const current = item.decision?.decision;
+          const actions = [
+            ['review', 'Review notes'],
+            ['continue', 'Continue'],
+            ['skip_reading_and_prove', 'Skip reading, prove it'],
+            ['start_new', 'Start new']
+          ];
+          const row = document.createElement('div');
+          row.className = 'decision-row';
+          actions.forEach(([value, label]) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.textContent = label;
+            button.setAttribute('aria-pressed', String(current === value));
+            button.addEventListener('click', () => saveDecision(layer, value, notes, panel));
+            row.append(button);
+          });
+          panel.append(row);
+          const warning = document.createElement('p');
+          warning.className = 'coverage-warning';
+          warning.setAttribute('role', 'status');
+          warning.textContent = item.missing?.slice(-1)[0] || '';
+          panel.append(warning);
+        } catch (_) {
+          panel.innerHTML = '<h3>Sakethwiki coverage</h3><p>Open the local app on this Mac to compare this layer with Sakethwiki.</p><p class="coverage-warning" role="status"></p>';
+        }
+      }
+      function taskSource(layer, position) {
+        const resources = [...layer.element.querySelectorAll('.resource')];
+        const labs = [...layer.element.querySelectorAll('.lab-step')];
+        const source = position < 2 ? resources[position] : labs[position - 2];
+        const title = source?.querySelector('h3')?.textContent.trim() || (position === 3 ? 'Create and keep your proof' : 'Complete this input');
+        const description = source?.querySelector('p')?.textContent.trim() || 'Record the evidence named below.';
+        const link = source?.querySelector('a');
+        return {title, description, link};
+      }
+      function taskPromptSpec(layer, position) {
+        if (layer.index === 0 && position === 0) return {
+          question: 'Question: What are the two memory-locality ideas you need before cache misses make sense?',
+          hint: 'Hint: think about nearby addresses and repeated accesses. Do not write a definition from memory; connect it to why the CPU gets surprised.'
+        };
+        if (layer.index === 0 && position === 1) return {
+          question: 'Question: Pick one OS object from OSTEP. What state does the OS remember for it, and what event changes that state?',
+          hint: 'Hint: process, thread, page, file descriptor, or blocked task are all fine. Use one concrete event.'
+        };
+        if (layer.index === 0 && position === 2) return {
+          question: 'Question: Write your own tiny benchmark. When stride grows, where does time per visited element jump, and what does that reveal about memory?',
+          hint: 'Hint: stride means jump size through the array. Compare ns per visited element, because total runtime can shrink when you visit fewer elements.'
+        };
+        return {
+          question: 'Question: What would prove that you understood this task without rereading the whole source?',
+          hint: 'Hint: save one small result: a measurement, explanation, link, command output, or table.'
+        };
+      }
+      function taskPrompt(layer, position) {
+        const spec = taskPromptSpec(layer, position);
+        const prompt = document.createElement('div');
+        prompt.className = 'task-prompt';
+        const question = document.createElement('strong');
+        question.textContent = spec.question;
+        const hint = document.createElement('small');
+        hint.textContent = spec.hint;
+        prompt.append(question, hint);
+        return prompt;
+      }
+      function hashString(value) {
+        let hash = 2166136261;
+        for (let index = 0; index < value.length; index++) {
+          hash ^= value.charCodeAt(index);
+          hash = Math.imul(hash, 16777619);
+        }
+        return hash >>> 0;
+      }
+      function seededShuffle(items, seed) {
+        const shuffled = [...items];
+        let state = hashString(seed) || 1;
+        for (let index = shuffled.length - 1; index > 0; index--) {
+          state = Math.imul(state ^ (state >>> 15), 2246822507) >>> 0;
+          const swap = state % (index + 1);
+          [shuffled[index], shuffled[swap]] = [shuffled[swap], shuffled[index]];
+        }
+        return shuffled;
+      }
+      function distractorsFor(fact, layerFacts, seed) {
+        const templates = [
+          text => text.replace(/\bcan\b/g, 'always').replace(/\bcan be\b/g, 'is always'),
+          text => text.replace(/\bneeds?\b/g, 'does not need').replace(/\buses?\b/g, 'does not use'),
+          text => text.replace(/\bdifferent\b/g, 'the same').replace(/\bseparate\b/g, 'identical'),
+          text => text.replace(/\bmeasure(?:s|ment)?\b/gi, 'guess').replace(/\bcontrols?\b/g, 'ignores')
+        ];
+        const generated = templates.map(template => template(fact)).filter(text => text !== fact && text.length > 20);
+        const nearby = seededShuffle(layerFacts.filter(item => item !== fact), `${seed}-nearby`)
+          .map(text => `Only memorize this phrase without connecting it to the system: ${text.charAt(0).toLowerCase()}${text.slice(1)}`);
+        return [...generated, ...nearby].slice(0, 3);
+      }
+      function multipleChoiceQuestion(name, fact, layerFacts, saved, seed) {
+        const field = document.createElement('fieldset'); field.className = 'task-check';
+        const legend = document.createElement('legend'); legend.textContent = 'Quick check: Which statement is correct?'; field.append(legend);
+        const choices = seededShuffle([fact, ...distractorsFor(fact, layerFacts, seed)], seed).slice(0, 4);
+        choices.forEach(option => { const label=document.createElement('label'); label.className='question-option'; const input=document.createElement('input'); input.type='radio'; input.name=name; input.value=option; input.checked=saved === option; label.append(input, document.createTextNode(option)); field.append(label); });
+        field.dataset.answer = fact;
+        return field;
+      }
+      function renderWorkspace() {
+        const root = document.getElementById('learning-workspace'); if (!root) return;
+        const layer = layers.find(item => item.id === activeLayerId) || layers[0]; const state = layerState(layer);
+        const main = document.createElement('div'); main.className='workspace-main';
+        const intro = document.createElement('section'); intro.className='current-task';
+        intro.innerHTML = `<p class="eyebrow">Layer ${layer.index + 1} · ${state.selected} of ${state.total} manual course checkmarks complete</p><h2>${layer.title}</h2><p>Work through three inputs, check your understanding, then make one piece of evidence that you can revisit later.</p>`; main.append(intro);
+        const coveragePanel=document.createElement('section');coveragePanel.className='coverage-panel';coveragePanel.setAttribute('aria-label','Sakethwiki coverage');main.append(coveragePanel);void renderCoverage(layer,coveragePanel);
+        const stack=document.createElement('div'); stack.className='task-stack';
+        [0,1,2].forEach(position => { const item=taskSource(layer,position); const card=document.createElement('article'); card.className='task-card'; card.dataset.done=String(progress[boxes.indexOf(layer.boxes[position])].done); const kind=position===2?'Build or practice':'Read and understand'; card.innerHTML=`<div class="task-kicker"><span class="task-index">${position+1}</span>${kind}</div><h3>${item.title}</h3><p>${item.description}</p>`; if(item.link){const a=document.createElement('a');a.className='task-link';a.href=item.link.href;a.textContent='Open learning material';card.append(a);} if(layer.index===0 && position===1){const chapters=document.createElement('p');chapters.className='task-chapters';chapters.innerHTML='Read in order: <a href="https://pages.cs.wisc.edu/~remzi/OSTEP/cpu-intro.pdf">Chapter 4 · Processes</a> · <a href="https://pages.cs.wisc.edu/~remzi/OSTEP/cpu-api.pdf">Chapter 5 · Process API</a> · <a href="https://pages.cs.wisc.edu/~remzi/OSTEP/cpu-mechanisms.pdf">Chapter 6 · Limited Direct Execution</a> · <a href="https://pages.cs.wisc.edu/~remzi/OSTEP/cpu-sched.pdf">Chapter 7 · CPU Scheduling</a>';card.append(chapters);} card.append(taskPrompt(layer, position));const evidence=document.createElement('div');evidence.className='task-evidence';evidence.append(layer.boxes[position].parentElement);card.append(evidenceEditor(layer, position));card.append(evidence);stack.append(card); });
+        const quiz=document.createElement('section');quiz.className='layer-quiz';quiz.innerHTML='<p class="eyebrow">Layer check</p><h3>Ten shuffled questions before the proof task</h3><p>These are for feedback. A score never checks work off for you.</p>';const details=document.createElement('details');details.innerHTML='<summary>Open the 10-question quiz</summary>';const saved=quizAttempts[layer.id]?.layer?.answers||[];const layerFacts=quizFacts[layer.index];layerFacts.forEach((fact,i)=>{const question=multipleChoiceQuestion(`${layer.id}-quiz-${i}`,fact,layerFacts,saved[i],`${layer.id}-${i}`);question.addEventListener('change',()=>{const answers=layerFacts.map((_,index)=>details.querySelector(`input[name="${layer.id}-quiz-${index}"]:checked`)?.value||null);quizAttempts[layer.id]={...(quizAttempts[layer.id]||{}),layer:{answers,selected_at:new Date().toISOString()}};saveQuizAttempts();});details.append(question);});const selectedNotice=document.createElement('p');selectedNotice.className='save-state';selectedNotice.textContent='Choices are shuffled per question. Each selected answer saves in this browser.';details.append(selectedNotice);const grade=document.createElement('button');grade.type='button';grade.className='quiz-button';grade.textContent='Score layer quiz';grade.onclick=()=>{const answers=layerFacts.map((_,i)=>details.querySelector(`input[name="${layer.id}-quiz-${i}"]:checked`)?.value||null);const score=answers.filter((answer,index)=>answer===layerFacts[index]).length;quizAttempts[layer.id]={...(quizAttempts[layer.id]||{}),layer:{answers,score,submitted_at:new Date().toISOString()}};saveQuizAttempts();renderWorkspace();};details.append(grade);if(Number.isInteger(quizAttempts[layer.id]?.layer?.score)){const score=document.createElement('p');score.className='quiz-feedback';score.dataset.correct=String(quizAttempts[layer.id].layer.score>=8);score.textContent=`Latest score: ${quizAttempts[layer.id].layer.score}/10. ${quizAttempts[layer.id].layer.score>=8?'Use the proof task to demonstrate it.':'Review the task cards before the proof.'}`;details.append(score);}quiz.append(details);stack.append(quiz);
+        const proof=taskSource(layer,3);const proofCard=document.createElement('article');proofCard.className='proof-card';proofCard.dataset.done=String(progress[boxes.indexOf(layer.boxes[3])].done);proofCard.innerHTML=`<div class="task-kicker"><span class="task-index">4</span>Proof and evidence</div><h3>${proof.title}</h3><p>${proof.description}</p>`;proofCard.append(taskPrompt(layer, 3));const evidence=document.createElement('div');evidence.className='task-evidence';evidence.append(layer.boxes[3].parentElement);proofCard.append(evidenceEditor(layer, 3));proofCard.append(evidence);stack.append(proofCard);main.append(stack);
+        const materials=document.createElement('details');materials.className='materials';materials.innerHTML='<summary>Materials and context</summary>';const list=document.createElement('ul');[...layer.element.querySelectorAll('.resource, .lab-step')].forEach(node=>{const li=document.createElement('li');li.textContent=node.querySelector('h3')?.textContent.trim()||node.textContent.trim();list.append(li);});materials.append(list);main.append(materials);
+        const side=document.createElement('aside');side.className='workspace-side';const map=document.createElement('section');map.className='course-map';map.innerHTML='<h2>Your course map</h2><p>Manual progress only. Sakethwiki notes do not complete a layer.</p>';layers.forEach(item=>{const s=layerState(item);const row=document.createElement('button');row.type='button';row.className='map-row';row.dataset.state=s.complete?'complete':s.started?'started':'not-started';row.setAttribute('aria-current',String(item.id===layer.id));row.innerHTML=`<i class="map-dot"></i><span><strong>${item.index+1}. ${item.title}</strong><br>${s.selected}/${s.total} course checkmarks</span><b>${s.complete?'✓':''}</b>`;row.onclick=()=>selectLayer(item.id,true);map.append(row);});const hist=document.createElement('p');hist.className='workspace-history';hist.innerHTML=`<a href="#learning-history">${progress.filter(item=>item.done).length} completed checkmarks</a> are recorded in Done earlier.`;map.append(hist);side.append(map);root.replaceChildren(main,side);
+      }
+      function persistProgress() {
+        try { localStorage.setItem(storageKey, JSON.stringify({schema_version: 2, storage_key: storageKey, checkpoints: progress})); } catch (_) {}
+        void syncAppState();
+      }
+      function updateView(save = false) {
+        if (save) persistProgress();
+        const complete = progress.filter(item => item.done).length;
+        const percent = Math.round((complete / boxes.length) * 100);
+        document.querySelector('#progress-value').textContent = `${percent}%`;
+        document.querySelector('#progress-fill').style.width = `${percent}%`;
+        document.querySelector('#progress-detail').textContent = `${complete} of ${boxes.length} checkpoints complete`;
+        layers.forEach(layer => {
+          const state = layerState(layer);
+          layer.element.classList.toggle('done', state.complete);
+          layer.element.querySelector('.status').textContent = state.complete ? 'Complete' : state.started ? 'In progress' : 'Not started';
+        });
+        renderHome(); renderHistory(); selectLayer(activeLayerId, false);
+      }
+      function adoptServerState(state) {
+        serverUpdatedAt = state.updated_at || null;
+        progress = state.checkpoints.map(item => ({done: Boolean(item.done), completed_at: item.completed_at || null}));
+        quizAttempts = state.quiz_attempts && typeof state.quiz_attempts === 'object' ? state.quiz_attempts : {};
+        evidenceNotes = state.evidence_notes && typeof state.evidence_notes === 'object' ? state.evidence_notes : {};
+        boxes.forEach((box, i) => { box.checked = progress[i].done; });
+        try { localStorage.setItem(storageKey, JSON.stringify({schema_version: 2, storage_key: storageKey, checkpoints: progress})); localStorage.setItem(quizKey, JSON.stringify(quizAttempts)); localStorage.setItem(evidenceKey, JSON.stringify(evidenceNotes)); } catch (_) {}
+        updateView(false);
+      }
+      async function hydrateAppState() {
+        try {
+          const response = await fetch('/api/progress');
+          if (!response.ok) throw new Error('Progress unavailable');
+          const state = await response.json();
+          if (Array.isArray(state.checkpoints) && state.checkpoints.length === boxes.length) {
+            if (state.updated_at !== serverUpdatedAt && !dirty && !saving) adoptServerState(state);
+          } else if (progress.some(item => item.done) || Object.keys(quizAttempts).length || Object.keys(evidenceNotes).length) {
+            void syncAppState();
+          }
+        } catch (_) {}
+      }
+      // Pick up saves made on another device when this window comes back (tab switch, app switch, iPad wake).
+      function refreshFromServer() {
+        if (document.visibilityState !== 'visible') { if (dirty) { clearTimeout(saveTimer); void flushAppState(); } return; }
+        if (dirty) syncAppState(); else if (!saving) void hydrateAppState();
+      }
+      document.addEventListener('visibilitychange', refreshFromServer);
+      window.addEventListener('focus', refreshFromServer);
+      window.addEventListener('pagehide', () => { if (dirty) { clearTimeout(saveTimer); void flushAppState(); } });
+      updateView();
+      void hydrateAppState();
+      const message = document.getElementById('progress-message');
+      const dialog = document.getElementById('import-confirm');
+      const input = document.getElementById('import-progress');
+      let pending = null;
+      document.getElementById('export-progress').addEventListener('click', () => {
+        const data = {schema_version: 2, storage_key: storageKey, checkpoints: progress};
+        const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'}));
+        const a = document.createElement('a'); a.href = url; a.download = 'learning-progress.json'; a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        message.textContent = 'Progress exported. Keep this file to restore your checkpoints.';
+      });
+      document.getElementById('choose-progress').addEventListener('click', () => input.click());
+      input.addEventListener('change', async () => {
+        pending = null;
+        const file = input.files[0];
+        if (!file) return;
+        try {
+          if (file.size > 16384) throw new Error('File too large');
+          const data = JSON.parse(await file.text());
+          if (data && data.schema_version === 1 && data.storage_key === legacyStorageKey && Array.isArray(data.checkpoints) && data.checkpoints.length === boxes.length && data.checkpoints.every(value => typeof value === 'boolean')) pending = legacyToV2(data.checkpoints);
+          else if (validV2(data)) pending = data.checkpoints;
+          else throw new Error('Invalid progress format');
+          const changes = pending.filter((value, i) => value.done !== progress[i].done || value.completed_at !== progress[i].completed_at).length;
+          document.getElementById('import-diff').textContent = `${pending.filter(value => value.done).length} of ${boxes.length} checkpoints completed in this file. ${changes} completion or date records would change. Current progress stays intact until you confirm.`;
+          dialog.showModal();
+        } catch (_) { message.textContent = 'Import rejected: use a valid version 1 or version 2 progress export with exactly 36 checkpoints.'; }
+        finally { input.value = ''; }
+      });
+      document.getElementById('import-apply').addEventListener('click', () => {
+        if (!pending) return;
+        progress = pending.map(item => ({done: item.done, completed_at: item.completed_at}));
+        boxes.forEach((box, i) => { box.checked = progress[i].done; });
+        updateView(true); pending = null; dialog.close(); message.textContent = 'Progress imported.';
+      });
+      document.getElementById('import-cancel').addEventListener('click', () => {pending = null; dialog.close();});
+      dialog.addEventListener('cancel', () => {pending = null;});
+      const referenceButton = document.getElementById('toggle-reference');
+      referenceButton.addEventListener('click', () => {
+        const visible = document.body.classList.toggle('show-secondary');
+        referenceButton.setAttribute('aria-expanded', String(visible));
+        referenceButton.textContent = visible ? 'Hide reference material' : 'Show reference material';
+      });
+    })();
+  </script>
+  <script src="live.js"></script>
+</body>
+</html>

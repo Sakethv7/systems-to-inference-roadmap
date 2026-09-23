@@ -1,0 +1,14 @@
+services:
+  saketh-learning:
+    build: .
+    container_name: saketh-learning
+    environment:
+      APP_STATE_PATH: /app/data/learning-app.sqlite3
+      VAULT_PATH: /vault
+      APP_ALLOWED_HOSTS: ${APP_ALLOWED_HOSTS:-}
+    ports:
+      - "${LEARNING_HOST:-127.0.0.1}:${LEARNING_PORT:-8768}:8768"
+    volumes:
+      - ./data:/app/data
+      - ${SAKETH_VAULT_PATH:?set SAKETH_VAULT_PATH to your Obsidian vault}:/vault:ro
+    restart: unless-stopped

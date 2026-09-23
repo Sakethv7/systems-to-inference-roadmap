@@ -1,0 +1,16 @@
+data/
+backups/
+build/
+dist/
+__pycache__/
+*.pyc
+*.sqlite3
+.env
+qa-*.png
+qa-live/
+labs/process_api/exec_target
+labs/process_api/fork_basic
+labs/process_api/fork_exec
+labs/process_api/fork_wait
+node_modules/
+.DS_Store

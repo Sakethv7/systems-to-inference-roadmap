@@ -1,0 +1,9 @@
+{
+  "name": "Saketh Learning",
+  "short_name": "Learning",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#eef2ee",
+  "theme_color": "#133a35",
+  "icons": [{ "src": "/icon.png", "sizes": "1254x1254", "type": "image/png", "purpose": "any" }]
+}
